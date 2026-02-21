@@ -5,6 +5,7 @@ from PIL import Image
 import json
 from datetime import datetime
 import os
+from pathlib import Path
 
 token = os.getenv('token')
 
@@ -14,12 +15,14 @@ intents.message_content = True
 bot = commands.Bot(command_prefix="!", intents=intents)
 
 # pool
+base_dir = Path(__file__).parent
+pool_dir = base_dir / "pool"
 cards = [
-    ("SSR", "XXX", r"C:\Users\jhua0\Desktop\MimiGacha\pool\SSR.png"),
-    ("SR", "YYY", r"C:\Users\jhua0\Desktop\MimiGacha\pool\SR.png"),
-    ("R", "ZZZ", r"C:\Users\jhua0\Desktop\MimiGacha\pool\R.png"),
-    ("R", "ZZZ", r"C:\Users\jhua0\Desktop\MimiGacha\pool\R2.png"),
-    ("R", "ZZZ", r"C:\Users\jhua0\Desktop\MimiGacha\pool\R3.png")
+    ("SSR", "XXX", pool_dir / "SSR.png"),
+    ("SR", "YYY", pool_dir / "SR.png"),
+    ("R", "ZZZ", pool_dir / "R.png"),
+    ("R", "ZZZ", pool_dir / "R2.png"),
+    ("R", "ZZZ", pool_dir / "R3.png")
 ]
 
 # record card count / day
@@ -125,4 +128,5 @@ async def on_ready():
 
 
 bot.run(token)
+
 
