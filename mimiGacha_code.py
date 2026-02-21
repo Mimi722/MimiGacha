@@ -3,9 +3,10 @@ import discord
 from discord.ext import commands
 from PIL import Image
 import json
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 import os
 from pathlib import Path
+import sqlite3
 
 token = os.getenv('token')
 
@@ -13,6 +14,23 @@ token = os.getenv('token')
 intents = discord.Intents.default()
 intents.message_content = True
 bot = commands.Bot(command_prefix="!", intents=intents)
+
+DB_FILE = "player.db"
+
+def init_db():
+    conn = sqlite3.connect(DB_FILE)
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS players (
+            user_id TEXT PRIMARY KEY,
+            date TEXT,
+            draw_count INTEGER
+        )
+    """)
+
+    conn.commit()
+    conn.close()
 
 # pool
 base_dir = Path(__file__).parent
@@ -25,50 +43,62 @@ cards = [
     ("R", "ZZZ", pool_dir / "R3.png")
 ]
 
-# record card count / day
-DATA_FILE = "player_data.json"
-
-
-def load_data():
-    try:
-        with open(DATA_FILE, "r") as f:
-            return json.load(f)
-    except FileNotFoundError:
-        return {}
-
-
-def save_data(data):
-    with open(DATA_FILE, "w") as f:
-        json.dump(data, f, indent=4)
-
-
 def can_draw(user_id, draw_count=1):
-    data = load_data()
-    today = datetime.now().strftime("%Y-%m-%d")
 
-    if user_id not in data:
-        data[user_id] = {"date": today, "count": 0}
+    AEST = timezone(timedelta(hours=10))
+    today = datetime.now(AEST).strftime("%Y-%m-%d")
 
-    if data[user_id]["date"] != today:
-        data[user_id]["date"] = today
-        data[user_id]["count"] = 0
+    conn = sqlite3.connect(DB_FILE)
+    cursor = conn.cursor()
 
-    if data[user_id]["count"] + draw_count > 22:
-        return False, data[user_id]["count"]
+    cursor.execute(
+        "SELECT date, draw_count FROM players WHERE user_id=?",
+        (user_id,)
+    )
+    row = cursor.fetchone()
 
-    data[user_id]["count"] += draw_count
-    save_data(data)
-    return True, data[user_id]["count"]
+    if row is None:
+        cursor.execute(
+            "INSERT INTO players VALUES (?, ?, ?)",
+            (user_id, today, draw_count)
+        )
+        conn.commit()
+        conn.close()
+        return True, draw_count
+
+    saved_date, count = row
+
+    if saved_date != today:
+        count = 0
+
+    if count + draw_count > 22:
+        conn.close()
+        return False, count
+
+    count += draw_count
+
+    cursor.execute(
+        "UPDATE players SET date=?, draw_count=? WHERE user_id=?",
+        (today, count, user_id)
+    )
+
+    conn.commit()
+    conn.close()
+
+    return True, count
 
 # combine image
-def combine_images(image_paths, target_height=300):
-
+def combine_images(image_paths, user_id, target_height=300):
     resized_images = []
+
     for p in image_paths:
-        img = Image.open(p)
+        img = Image.open(p).convert("RGBA")
         w, h = img.size
         new_width = int(w * (target_height / h))
-        img = img.resize((new_width, target_height), Image.Resampling.LANCZOS)
+        img = img.resize(
+            (new_width, target_height),
+            Image.Resampling.LANCZOS
+        )
         resized_images.append(img)
 
     total_width = sum(img.size[0] for img in resized_images)
@@ -79,8 +109,13 @@ def combine_images(image_paths, target_height=300):
         combined.paste(img, (x_offset, 0))
         x_offset += img.size[0]
 
-    combined.save("result.png")
-    return "result.png"
+    filename = f"result_{user_id}_{random.randint(1000,9999)}.png"
+    combined.save(filename)
+
+    for img in resized_images:
+        img.close()
+
+    return filename
 
 # /draw
 @bot.tree.command(name="draw", description="抽一張卡")
@@ -99,7 +134,7 @@ async def draw(interaction: discord.Interaction):
         file=discord.File(img_path)
     )
 
-# /draw10
+# /draw5
 @bot.tree.command(name="draw5", description="五連抽卡")
 async def draw5(interaction: discord.Interaction):
     user_id = str(interaction.user.id)
@@ -123,10 +158,12 @@ async def draw5(interaction: discord.Interaction):
 # run bot
 @bot.event
 async def on_ready():
+    init_db()
     await bot.tree.sync()
     print(f"Logged in as {bot.user}")
 
 
 bot.run(token)
+
 
 
