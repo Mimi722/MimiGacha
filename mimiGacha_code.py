@@ -4,8 +4,10 @@ from discord.ext import commands
 from PIL import Image
 import json
 from datetime import datetime
+import os
 
-token = "MTQ3NDI4NzAxOTI2OTAyOTk2OQ.GsEDrk.MvTmGElewXoPrysAvFpBw1tanDyXktep1mZLb8"
+token = os.getenv('token')
+bot.run(token)
 
 # bot settings
 intents = discord.Intents.default()
@@ -121,5 +123,6 @@ async def draw5(interaction: discord.Interaction):
 async def on_ready():
     await bot.tree.sync()
     print(f"Logged in as {bot.user}")
+
 
 bot.run(token)
