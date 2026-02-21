@@ -7,7 +7,6 @@ from datetime import datetime
 import os
 
 token = os.getenv('token')
-bot.run(token)
 
 # bot settings
 intents = discord.Intents.default()
@@ -126,3 +125,4 @@ async def on_ready():
 
 
 bot.run(token)
+
