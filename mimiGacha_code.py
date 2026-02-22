@@ -88,34 +88,34 @@ def can_draw(user_id, draw_count=1):
     return True, count
 
 # combine image
-def combine_images(image_paths, user_id, target_height=300):
-    resized_images = []
+# def combine_images(image_paths, user_id, target_height=300):
+#     resized_images = []
 
-    for p in image_paths:
-        img = Image.open(p).convert("RGBA")
-        w, h = img.size
-        new_width = int(w * (target_height / h))
-        img = img.resize(
-            (new_width, target_height),
-            Image.Resampling.LANCZOS
-        )
-        resized_images.append(img)
+#     for p in image_paths:
+#         img = Image.open(p).convert("RGBA")
+#         w, h = img.size
+#         new_width = int(w * (target_height / h))
+#         img = img.resize(
+#             (new_width, target_height),
+#             Image.Resampling.LANCZOS
+#         )
+#         resized_images.append(img)
 
-    total_width = sum(img.size[0] for img in resized_images)
-    combined = Image.new("RGBA", (total_width, target_height))
+#     total_width = sum(img.size[0] for img in resized_images)
+#     combined = Image.new("RGBA", (total_width, target_height))
 
-    x_offset = 0
-    for img in resized_images:
-        combined.paste(img, (x_offset, 0))
-        x_offset += img.size[0]
+#     x_offset = 0
+#     for img in resized_images:
+#         combined.paste(img, (x_offset, 0))
+#         x_offset += img.size[0]
 
-    filename = f"result_{user_id}_{random.randint(1000,9999)}.png"
-    combined.save(filename)
+#     filename = f"result_{user_id}_{random.randint(1000,9999)}.png"
+#     combined.save(filename)
 
-    for img in resized_images:
-        img.close()
+#     for img in resized_images:
+#         img.close()
 
-    return filename
+#     return filename
 
 # /draw
 @bot.tree.command(name="draw", description="抽一張卡")
@@ -138,22 +138,26 @@ async def draw(interaction: discord.Interaction):
 @bot.tree.command(name="draw5", description="五連抽卡")
 async def draw5(interaction: discord.Interaction):
     await interaction.response.defer()
+
     user_id = str(interaction.user.id)
     allowed, count = can_draw(user_id, draw_count=5)
+
     if not allowed:
-        await interaction.response.send_message(
+        await interaction.followup.send(
             f"{interaction.user.mention} 五連抽會超過今天 22 抽上限！目前已抽 {count}/22"
         )
         return
 
     drawn_cards = [random.choice(cards) for _ in range(5)]
     text_list = [f"{rarity} - {name}" for rarity, name, _ in drawn_cards]
-    image_paths = [img_path for _, _, img_path in drawn_cards]
-    result_path = combine_images(image_paths, user_id)
+
+    files = []
+    for i, (_, _, img_path) in enumerate(drawn_cards, 1):
+        files.append(discord.File(img_path, filename=f"{user_id}_{i}.png"))
 
     await interaction.followup.send(
         f"{interaction.user.mention} 五連抽結果 (今天已抽 {count}/22)：\n" + ", ".join(text_list),
-        file=discord.File(result_path)
+        files=files
     )
 
 # run bot
@@ -165,6 +169,7 @@ async def on_ready():
 
 
 bot.run(token)
+
 
 
 
