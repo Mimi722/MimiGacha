@@ -93,6 +93,8 @@ def can_draw(user_id, draw_count=1):
 @bot.tree.command(name="help", description="使用說明")
 async def help(interaction: discord.Interaction):
     help_text = """```
+    
+    MimiGacha使用說明：
     1.在文字頻道中輸入
      /draw: 抽一張卡
      /draw5: 抽五張卡
@@ -154,6 +156,7 @@ async def on_ready():
 
 
 bot.run(token)
+
 
 
 
