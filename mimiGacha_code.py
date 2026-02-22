@@ -15,6 +15,7 @@ intents = discord.Intents.default()
 intents.message_content = True
 bot = commands.Bot(command_prefix="!", intents=intents)
 
+# database
 DB_FILE = "player.db"
 
 def init_db():
@@ -43,6 +44,7 @@ cards = [
     ("R", "ZZZ", pool_dir / "R3.png")
 ]
 
+# daily limit
 def can_draw(user_id, draw_count=1):
 
     AEST = timezone(timedelta(hours=10))
@@ -86,6 +88,19 @@ def can_draw(user_id, draw_count=1):
     conn.close()
 
     return True, count
+
+# /help
+@bot.tree.command(name="help", description="使用說明")
+async def help(interaction: discord.Interaction):
+    help_text = """
+    1.在文字頻道中輸入
+    **/draw**: 抽一張卡
+    **/draw5**: 抽五張卡
+    2.每日上限22抽，隔天重置
+    3.卡片種類為SSR、SR和R三種，因目前卡片數量較少所以機制僅使用隨機，無保底
+    4.圖片會直接顯示在訊息中，請耐心等待
+    """
+    await interaction.response.send_message(help_text)
 
 # /draw
 @bot.tree.command(name="draw", description="抽一張卡")
@@ -139,6 +154,7 @@ async def on_ready():
 
 
 bot.run(token)
+
 
 
 
