@@ -148,7 +148,7 @@ async def draw5(interaction: discord.Interaction):
     drawn_cards = [random.choice(cards) for _ in range(5)]
     text_list = [f"{rarity} - {name}" for rarity, name, _ in drawn_cards]
     image_paths = [img_path for _, _, img_path in drawn_cards]
-    result_path = combine_images(image_paths)
+    result_path = combine_images(image_paths, user_id)
 
     await interaction.response.send_message(
         f"{interaction.user.mention} 五連抽結果 (今天已抽 {count}/22)：\n" + ", ".join(text_list),
@@ -164,6 +164,7 @@ async def on_ready():
 
 
 bot.run(token)
+
 
 
 
