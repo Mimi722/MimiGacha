@@ -87,36 +87,6 @@ def can_draw(user_id, draw_count=1):
 
     return True, count
 
-# combine image
-# def combine_images(image_paths, user_id, target_height=300):
-#     resized_images = []
-
-#     for p in image_paths:
-#         img = Image.open(p).convert("RGBA")
-#         w, h = img.size
-#         new_width = int(w * (target_height / h))
-#         img = img.resize(
-#             (new_width, target_height),
-#             Image.Resampling.LANCZOS
-#         )
-#         resized_images.append(img)
-
-#     total_width = sum(img.size[0] for img in resized_images)
-#     combined = Image.new("RGBA", (total_width, target_height))
-
-#     x_offset = 0
-#     for img in resized_images:
-#         combined.paste(img, (x_offset, 0))
-#         x_offset += img.size[0]
-
-#     filename = f"result_{user_id}_{random.randint(1000,9999)}.png"
-#     combined.save(filename)
-
-#     for img in resized_images:
-#         img.close()
-
-#     return filename
-
 # /draw
 @bot.tree.command(name="draw", description="抽一張卡")
 async def draw(interaction: discord.Interaction):
@@ -169,6 +139,7 @@ async def on_ready():
 
 
 bot.run(token)
+
 
 
 
