@@ -137,6 +137,7 @@ async def draw(interaction: discord.Interaction):
 # /draw5
 @bot.tree.command(name="draw5", description="五連抽卡")
 async def draw5(interaction: discord.Interaction):
+    await interaction.response.defer()
     user_id = str(interaction.user.id)
     allowed, count = can_draw(user_id, draw_count=5)
     if not allowed:
@@ -150,7 +151,7 @@ async def draw5(interaction: discord.Interaction):
     image_paths = [img_path for _, _, img_path in drawn_cards]
     result_path = combine_images(image_paths, user_id)
 
-    await interaction.response.send_message(
+    await interaction.followup.send(
         f"{interaction.user.mention} 五連抽結果 (今天已抽 {count}/22)：\n" + ", ".join(text_list),
         file=discord.File(result_path)
     )
@@ -164,6 +165,7 @@ async def on_ready():
 
 
 bot.run(token)
+
 
 
 
