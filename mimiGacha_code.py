@@ -131,6 +131,7 @@ async def mimihelp(interaction: discord.Interaction):
     help_text = """```
     
     MimiGacha使用說明：
+    
     1.在文字頻道中輸入
      /collection: 查看自己抽過的卡片
      /draw: 抽一張卡
@@ -152,6 +153,7 @@ async def latest(interaction: discord.Interaction):
     latest_text = """```
     
     卡池內卡片一覽：
+    
     SSR
     新年祈願
     
@@ -273,6 +275,7 @@ async def on_ready():
 
 
 bot.run(token)
+
 
 
 
