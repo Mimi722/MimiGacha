@@ -4,25 +4,21 @@
       "name": "新年祈願",
       "rarity": "SSR",
       "image": "pool/SSR.png",
-      "weight": 1
     },
     {
       "name": "米力全開",
       "rarity": "SR",
       "image": "pool/SR.png",
-      "weight": 5
     },
     {
       "name": "表情A",
       "rarity": "R",
       "image": "pool/R.png",
-      "weight": 20
     },
     {
       "name": "表情B",
       "rarity": "R",
       "image": "pool/R2.png",
-      "weight": 20
     }
   ]
 }
