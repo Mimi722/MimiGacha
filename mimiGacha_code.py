@@ -16,7 +16,7 @@ intents = discord.Intents.default()
 intents.message_content = True
 bot = commands.Bot(command_prefix="!", intents=intents)
 
-# database
+# player database
 DB_FILE = "player.db"
 def get_db():
     return sqlite3.connect(DB_FILE, timeout=10)
@@ -74,14 +74,11 @@ def add_card(user_id, rarity, name):
 
 # pool
 base_dir = Path(__file__).parent
-pool_dir = base_dir / "pool"
-cards = [
-    ("SSR", "XXX", pool_dir / "SSR.png"),
-    ("SR", "YYY", pool_dir / "SR.png"),
-    ("R", "ZZZ", pool_dir / "R.png"),
-    ("R", "ZZZ", pool_dir / "R2.png"),
-    ("R", "ZZZ", pool_dir / "R3.png")
-]
+
+with open(base_dir / "cards.json", encoding="utf-8") as f:
+    card_data = json.load(f)
+
+cards = card_data["cards"]
 
 # daily limit
 def can_draw(user_id, draw_count=1):
@@ -159,6 +156,16 @@ async def latest(interaction: discord.Interaction):
     ```"""
     await interaction.response.send_message(latest_text)
 
+# draw card operation
+def draw_card():
+    card = random.choice(cards)
+
+    rarity = card["rarity"]
+    name = card["name"]
+    img_path = base_dir / card["image"]
+
+    return rarity, name, img_path
+
 # /draw
 @bot.tree.command(name="draw", description="抽一張卡")
 async def draw(interaction: discord.Interaction):
@@ -170,7 +177,7 @@ async def draw(interaction: discord.Interaction):
         )
         return
 
-    rarity, name, img_path = random.choice(cards)
+    rarity, name, img_path = draw_card()
     add_card(user_id, rarity, name)
     await interaction.response.send_message(
         f"{interaction.user.mention} 抽到了 {rarity} - {name} (今天已抽 {count}/22)",
@@ -191,7 +198,7 @@ async def draw5(interaction: discord.Interaction):
         )
         return
 
-    drawn_cards = [random.choice(cards) for _ in range(5)]
+    drawn_cards = [draw_card() for _ in range(5)]
     text_list = [f"{rarity} - {name}" for rarity, name, _ in drawn_cards]
     for rarity, name, _ in drawn_cards:
         add_card(user_id, rarity, name)
@@ -259,5 +266,6 @@ async def on_ready():
 
 
 bot.run(token)
+
 
 
