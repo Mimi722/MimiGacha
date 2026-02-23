@@ -132,13 +132,15 @@ async def mimihelp(interaction: discord.Interaction):
     
     MimiGacha使用說明：
     1.在文字頻道中輸入
+     /collection: 查看自己抽過的卡片
      /draw: 抽一張卡
      /draw5: 抽五張卡
      /latest: 卡池內容一覽
-     /help: MimiGacha使用說明
+     /mimihelp: MimiGacha使用說明
     2.每日上限22抽，隔天重置
-    3.卡片種類為SSR、SR和R三種，因目前卡片數量較少所以機制僅使用隨機，無保底
-    4.圖片會直接顯示在訊息中，請耐心等待
+    3.卡片種類為SSR、SR和R三種
+    4.機制僅使用隨機，無保底
+    5.圖片會直接顯示在訊息中，請耐心等待
 
     p.s.可以提供自己的OC加入卡池
     ```"""
@@ -148,11 +150,16 @@ async def mimihelp(interaction: discord.Interaction):
 @bot.tree.command(name="latest", description="卡池內容")
 async def latest(interaction: discord.Interaction):
     latest_text = """```
-
+    
     卡池內卡片一覽：
-    SSR：新年祈願
-    SR：米力全開、米到成功、萬米奔騰
-    R：隨機表情符號
+    SSR
+    新年祈願
+    
+    SR
+    米力全開、米到成功、萬米奔騰
+    
+    R
+    隨機表情符號
     ```"""
     await interaction.response.send_message(latest_text)
 
@@ -208,7 +215,7 @@ async def draw5(interaction: discord.Interaction):
         files.append(discord.File(img_path, filename=f"{user_id}_{i}.png"))
 
     await interaction.followup.send(
-        f"{interaction.user.mention} 五連抽結果 (今天已抽 {count}/22)：\n" + ", ".join(text_list),
+        f"{interaction.user.mention} 五連抽結果 (今天已抽 {count}/22)：\n" + "\n".join(text_list),
         files=files
     )
 
@@ -266,6 +273,7 @@ async def on_ready():
 
 
 bot.run(token)
+
 
 
 
