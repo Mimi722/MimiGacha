@@ -27,11 +27,11 @@ def init_db():
     cursor = conn.cursor()
 
     cursor.execute("""
-        CREATE TABLE IF NOT EXISTS players (
-            user_id TEXT PRIMARY KEY,
-            date TEXT,
-            draw_count INTEGER
-        )
+    CREATE TABLE IF NOT EXISTS players (
+        user_id TEXT PRIMARY KEY,
+        total_draws INTEGER DEFAULT 0,
+        last_draw TEXT
+    )
     """)
 
     cursor.execute("""
@@ -73,6 +73,37 @@ def add_card(user_id, rarity, name):
     conn.commit()
     conn.close()
 
+# record player draw
+def record_draw(user_id, amount=1):
+    conn = sqlite3.connect(DB_FILE)
+    cursor = conn.cursor()
+
+    AEST = timezone(timedelta(hours=10))
+    today = datetime.now(AEST).strftime("%Y-%m-%d")
+
+    cursor.execute(
+        "SELECT total_draws FROM players WHERE user_id=?",
+        (user_id,)
+    )
+
+    row = cursor.fetchone()
+
+    if row:
+        cursor.execute("""
+            UPDATE players
+            SET total_draws = total_draws + ?,
+                last_draw = ?
+            WHERE user_id=?
+        """, (amount, today, user_id))
+
+    else:
+        cursor.execute("""
+            INSERT INTO players VALUES (?, ?, ?)
+        """, (user_id, amount, today))
+
+    conn.commit()
+    conn.close()
+
 # pool
 base_dir = Path(__file__).parent
 
@@ -80,51 +111,6 @@ with open(base_dir / "cards.json", encoding="utf-8") as f:
     card_data = json.load(f)
 
 cards = card_data["cards"]
-
-# daily limit
-def can_draw(user_id, draw_count=1):
-
-    AEST = timezone(timedelta(hours=10))
-    today = datetime.now(AEST).strftime("%Y-%m-%d")
-
-    conn = sqlite3.connect(DB_FILE)
-    cursor = conn.cursor()
-
-    cursor.execute(
-        "SELECT date, draw_count FROM players WHERE user_id=?",
-        (user_id,)
-    )
-    row = cursor.fetchone()
-
-    if row is None:
-        cursor.execute(
-            "INSERT INTO players VALUES (?, ?, ?)",
-            (user_id, today, draw_count)
-        )
-        conn.commit()
-        conn.close()
-        return True, draw_count
-
-    saved_date, count = row
-
-    if saved_date != today:
-        count = 0
-
-    if count + draw_count > 22:
-        conn.close()
-        return False, count
-
-    count += draw_count
-
-    cursor.execute(
-        "UPDATE players SET date=?, draw_count=? WHERE user_id=?",
-        (today, count, user_id)
-    )
-
-    conn.commit()
-    conn.close()
-
-    return True, count
 
 # /mimihelp
 @bot.tree.command(name="mimihelp", description="使用說明")
@@ -138,10 +124,9 @@ async def mimihelp(interaction: discord.Interaction):
      /draw5: 抽五張卡
      /latest: 卡池內容一覽
      /mimihelp: MimiGacha使用說明
-    2.每日上限22抽，隔天重置
-    3.卡片種類為SSR、SR和R三種
-    4.機制僅使用隨機，無保底
-    5.圖片會直接顯示在訊息中，請耐心等待
+    2.卡片種類為SSR、SR和R三種
+    3.機制僅使用隨機，無保底
+    4.圖片會直接顯示在訊息中，請耐心等待
 
     p.s.可以提供自己的OC加入卡池
     ```"""
@@ -180,7 +165,12 @@ def prepare_image(image_path, max_size_mb=7):
     img = Image.open(image_path).convert("RGB")
 
     quality = 95
-    temp_path = tempfile.mktemp(suffix=".jpg")
+    temp = tempfile.NamedTemporaryFile(
+        suffix=".jpg",
+        delete=False
+    )
+    temp_path = temp.name
+    temp.close()
 
     while True:
         img.save(temp_path, "JPEG", quality=quality)
@@ -199,17 +189,11 @@ def prepare_image(image_path, max_size_mb=7):
 @bot.tree.command(name="draw", description="抽一張卡")
 async def draw(interaction: discord.Interaction):
     user_id = str(interaction.user.id)
-    allowed, count = can_draw(user_id)
-    if not allowed:
-        await interaction.response.send_message(
-            f"{interaction.user.mention} 今天已經抽滿 22 次囉！"
-        )
-        return
-
     rarity, name, img_path = draw_card()
     add_card(user_id, rarity, name)
+    record_draw(user_id, 1)
     await interaction.response.send_message(
-        f"{interaction.user.mention} 抽到了 {rarity} - {name} (今天已抽 {count}/22)",
+        f"{interaction.user.mention} 抽到了 {rarity} - {name}",
         file=discord.File(img_path)
     )
 
@@ -219,19 +203,13 @@ async def draw5(interaction: discord.Interaction):
     await interaction.response.defer()
 
     user_id = str(interaction.user.id)
-    allowed, count = can_draw(user_id, draw_count=5)
-
-    if not allowed:
-        await interaction.followup.send(
-            f"{interaction.user.mention} 五連抽會超過今天 22 抽上限！目前已抽 {count}/22"
-        )
-        return
 
     drawn_cards = [draw_card() for _ in range(5)]
     text_list = [f"{rarity} - {name}" for rarity, name, _ in drawn_cards]
     for rarity, name, _ in drawn_cards:
         add_card(user_id, rarity, name)
-
+    record_draw(user_id, 5)
+    
     files = []
 
     for i, (_, _, img_path) in enumerate(drawn_cards, 1):
@@ -240,10 +218,11 @@ async def draw5(interaction: discord.Interaction):
         files.append(discord.File(safe_img, filename=f"{user_id}_{i}.jpg"))
 
     await interaction.followup.send(
-        f"{interaction.user.mention} 五連抽結果(今天已抽 {count}/22)：\n" +
+        f"{interaction.user.mention} 五連抽結果：\n" +
         ", ".join(text_list),
         files=files
     )
+    
 
     for f in files:
         try:
@@ -260,12 +239,4 @@ async def on_ready():
 
 
 bot.run(token)
-
-
-
-
-
-
-
-
 
