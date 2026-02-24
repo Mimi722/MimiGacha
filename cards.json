@@ -8,17 +8,42 @@
     {
       "name": "米力全開",
       "rarity": "SR",
-      "image": "pool/SR.png"
+      "image": "pool/SR1.png"
     },
     {
-      "name": "表情A",
+      "name": "萬米奔騰",
+      "rarity": "SR",
+      "image": "pool/SR2.png"
+    },
+     {
+      "name": "米到成功",
+      "rarity": "SR",
+      "image": "pool/SR3.png"
+    },
+    {
+      "name": "不開心惹",
       "rarity": "R",
-      "image": "pool/R.png"
+      "image": "pool/R1.png"
     },
     {
-      "name": "表情B",
+      "name": "好開心鴨",
       "rarity": "R",
       "image": "pool/R2.png"
+    },
+    {
+      "name": "超好笑",
+      "rarity": "R",
+      "image": "pool/R3.png"
+    },
+    {
+      "name": "好啊",
+      "rarity": "R",
+      "image": "pool/R4.png"
+    },
+    {
+      "name": "我不要哇",
+      "rarity": "R",
+      "image": "pool/R5.png"
     }
   ]
 }
