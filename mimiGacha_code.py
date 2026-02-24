@@ -241,7 +241,7 @@ async def draw5(interaction: discord.Interaction):
         files.append(discord.File(safe_img, filename=f"{user_id}_{i}.jpg"))
 
     await interaction.followup.send(
-        f"{interaction.user.mention} 五連抽結果：\n" +
+        f"{interaction.user.mention} 五連抽結果(今天已抽 {count}/22)：\n" +
         ", ".join(text_list),
         files=files
     )
@@ -306,6 +306,7 @@ async def on_ready():
 
 
 bot.run(token)
+
 
 
 
