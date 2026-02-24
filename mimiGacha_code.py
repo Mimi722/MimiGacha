@@ -134,7 +134,6 @@ async def mimihelp(interaction: discord.Interaction):
     MimiGacha使用說明：
     
     1.在文字頻道中輸入
-     /collection: 查看自己抽過的卡片
      /draw: 抽一張卡
      /draw5: 抽五張卡
      /latest: 卡池內容一覽
@@ -252,51 +251,6 @@ async def draw5(interaction: discord.Interaction):
         except:
             pass
 
-# /collection
-@bot.tree.command(name="collection", description="查看你的收藏")
-async def collection(interaction: discord.Interaction):
-
-    user_id = str(interaction.user.id)
-
-    conn = sqlite3.connect(DB_FILE)
-    cursor = conn.cursor()
-
-    cursor.execute("""
-        SELECT rarity, card_name, count
-        FROM cards_owned
-        WHERE user_id=?
-        ORDER BY
-        CASE rarity
-            WHEN 'SSR' THEN 3
-            WHEN 'SR' THEN 2
-            WHEN 'R' THEN 1
-        END DESC
-    """, (user_id,))
-
-    rows = cursor.fetchall()
-    conn.close()
-
-    if not rows:
-        await interaction.response.send_message(
-            f"{interaction.user.mention}還沒有抽到任何卡片！"
-        )
-        return
-
-    groups = defaultdict(list)
-
-    for rarity, name, count in rows:
-        groups[rarity].append(f"{name} x{count}")
-    
-    text = f"**{interaction.user.mention}的收藏：**\n"
-    
-    for rarity in ["SSR", "SR", "R"]:
-        if rarity in groups:
-            text += f"\n**{rarity}**\n"
-            text += "\n".join(groups[rarity])
-            text += "\n"
-            
-    await interaction.response.send_message(text)
-
 # run bot
 @bot.event
 async def on_ready():
@@ -306,6 +260,7 @@ async def on_ready():
 
 
 bot.run(token)
+
 
 
 
