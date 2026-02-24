@@ -2,6 +2,7 @@ import random
 import discord
 from discord.ext import commands
 from PIL import Image
+import tempfile
 import json
 from datetime import datetime, timezone, timedelta
 import os
@@ -175,6 +176,26 @@ def draw_card():
 
     return rarity, name, img_path
 
+# image_limit
+def prepare_image(image_path, max_size_mb=7):
+    img = Image.open(image_path).convert("RGB")
+
+    quality = 95
+    temp_path = tempfile.mktemp(suffix=".jpg")
+
+    while True:
+        img.save(temp_path, "JPEG", quality=quality)
+
+        size_mb = os.path.getsize(temp_path) / (1024 * 1024)
+
+        if size_mb <= max_size_mb or quality <= 30:
+            break
+
+        quality -= 10
+
+    img.close()
+    return temp_path
+
 # /draw
 @bot.tree.command(name="draw", description="抽一張卡")
 async def draw(interaction: discord.Interaction):
@@ -213,13 +234,23 @@ async def draw5(interaction: discord.Interaction):
         add_card(user_id, rarity, name)
 
     files = []
+
     for i, (_, _, img_path) in enumerate(drawn_cards, 1):
-        files.append(discord.File(img_path, filename=f"{user_id}_{i}.png"))
+        safe_img = prepare_image(img_path)
+    
+        files.append(discord.File(safe_img, filename=f"{user_id}_{i}.jpg"))
 
     await interaction.followup.send(
-        f"{interaction.user.mention} 五連抽結果 (今天已抽 {count}/22)：\n" + "\n".join(text_list),
+        f"{interaction.user.mention} 五連抽結果：\n" +
+        ", ".join(text_list),
         files=files
     )
+
+    for f in files:
+        try:
+            os.remove(f.fp.name)
+        except:
+            pass
 
 # /collection
 @bot.tree.command(name="collection", description="查看你的收藏")
@@ -247,7 +278,7 @@ async def collection(interaction: discord.Interaction):
 
     if not rows:
         await interaction.response.send_message(
-            "你還沒有抽到任何卡片！"
+            f"{interaction.user.mention}還沒有抽到任何卡片！"
         )
         return
 
@@ -256,7 +287,7 @@ async def collection(interaction: discord.Interaction):
     for rarity, name, count in rows:
         groups[rarity].append(f"{name} x{count}")
     
-    text = "**你的收藏：**\n"
+    text = f"**{interaction.user.mention}的收藏：**\n"
     
     for rarity in ["SSR", "SR", "R"]:
         if rarity in groups:
@@ -275,6 +306,7 @@ async def on_ready():
 
 
 bot.run(token)
+
 
 
 
