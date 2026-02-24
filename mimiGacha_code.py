@@ -158,10 +158,10 @@ async def latest(interaction: discord.Interaction):
     新年祈願
     
     SR
-    米力全開、米到成功、萬米奔騰
+    米力全開、萬米奔騰、米到成功
     
     R
-    隨機表情符號
+    不開心惹、好開心鴨、超好笑、好啊、我不要哇
     ```"""
     await interaction.response.send_message(latest_text)
 
@@ -275,6 +275,7 @@ async def on_ready():
 
 
 bot.run(token)
+
 
 
 
