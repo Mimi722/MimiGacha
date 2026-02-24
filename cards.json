@@ -1,46 +1,55 @@
 {
   "cards": [
     {
+      "card_id": "SSR001",
       "name": "新年祈願",
       "rarity": "SSR",
       "image": "pool/SSR1.png"
     },
     {
+      "card_id": "SR001",
       "name": "米力全開",
       "rarity": "SR",
       "image": "pool/SR1.png"
     },
     {
+      "card_id": "SR002",,
       "name": "萬米奔騰",
       "rarity": "SR",
       "image": "pool/SR2.png"
     },
      {
-      "name": "米到成功",
+      "card_id": "SSR003",
+       "name": "米到成功",
       "rarity": "SR",
       "image": "pool/SR3.png"
     },
     {
+      "card_id": "R001",
       "name": "不開心惹",
       "rarity": "R",
       "image": "pool/R1.png"
     },
     {
+      "card_id": "R002",
       "name": "好開心鴨",
       "rarity": "R",
       "image": "pool/R2.png"
     },
     {
+      "card_id": "R003",
       "name": "超好笑",
       "rarity": "R",
       "image": "pool/R3.png"
     },
     {
+      "card_id": "R004",
       "name": "好啊",
       "rarity": "R",
       "image": "pool/R4.png"
     },
     {
+      "card_id": "R005",
       "name": "我不要哇",
       "rarity": "R",
       "image": "pool/R5.png"
