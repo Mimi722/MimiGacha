@@ -149,19 +149,11 @@ p.s.可以提供自己的OC加入卡池
 
 @bot.tree.command(name="latest", description="卡池內容")
 async def latest(interaction: discord.Interaction):
-    latest_text = """```
-卡池內卡片一覽：
-
-SSR
-新年祈願
-
-SR
-米力全開、萬米奔騰、米到成功
-
-R
-不開心惹、好開心鴨、超好笑、好啊、我不要哇
-```"""
-    await interaction.response.send_message(latest_text)
+    base_dir = Path(__file__).parent
+    img_path = base_dir / "Slide1.JPG"
+    await interaction.response.send_message(
+        file=discord.File(img_path)
+    )
 
 @bot.tree.command(name="draw", description="抽一張卡")
 async def draw(interaction: discord.Interaction):
@@ -210,3 +202,4 @@ async def on_ready():
     print(f"Logged in as {bot.user}")
 
 bot.run(token)
+
