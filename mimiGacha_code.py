@@ -150,7 +150,7 @@ p.s.可以提供自己的OC加入卡池
 @bot.tree.command(name="latest", description="卡池內容")
 async def latest(interaction: discord.Interaction):
     base_dir = Path(__file__).parent
-    img_path = base_dir / "Slide1.JPG"
+    img_path = base_dir / "latest.jpg"
     await interaction.response.send_message(
         file=discord.File(img_path)
     )
