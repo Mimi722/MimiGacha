@@ -4,55 +4,109 @@
       "card_id": "SSR001",
       "name": "新年祈願",
       "rarity": "SSR",
-      "image": "pool/SSR1.png"
+      "image": "pool/SSR1.jpg"
+    },
+    {
+      "card_id": "SSR002",
+      "name": "童心未泯",
+      "rarity": "SSR",
+      "image": "pool/SSR2.jpg"
     },
     {
       "card_id": "SR001",
       "name": "米力全開",
       "rarity": "SR",
-      "image": "pool/SR1.png"
+      "image": "pool/SR1.jpg"
     },
     {
       "card_id": "SR002",
       "name": "萬米奔騰",
       "rarity": "SR",
-      "image": "pool/SR2.png"
+      "image": "pool/SR2.jpg"
     },
      {
-      "card_id": "SSR003",
+      "card_id": "SR003",
        "name": "米到成功",
       "rarity": "SR",
-      "image": "pool/SR3.png"
+      "image": "pool/SR3.jpg"
+    },
+    {
+      "card_id": "SR004",
+       "name": "彩蛋",
+      "rarity": "SR",
+      "image": "pool/SR4.jpg"
+    },
+    {
+      "card_id": "SR005",
+       "name": "十字麵包",
+      "rarity": "SR",
+      "image": "pool/SR5.jpg"
+    },
+    {
+      "card_id": "SR006",
+       "name": "使者",
+      "rarity": "SR",
+      "image": "pool/SR6.jpg"
     },
     {
       "card_id": "R001",
       "name": "不開心惹",
       "rarity": "R",
-      "image": "pool/R1.png"
+      "image": "pool/R1.jpg"
     },
     {
       "card_id": "R002",
       "name": "好開心鴨",
       "rarity": "R",
-      "image": "pool/R2.png"
+      "image": "pool/R2.jpg"
     },
     {
       "card_id": "R003",
       "name": "超好笑",
       "rarity": "R",
-      "image": "pool/R3.png"
+      "image": "pool/R3.jpg"
     },
     {
       "card_id": "R004",
       "name": "好啊",
       "rarity": "R",
-      "image": "pool/R4.png"
+      "image": "pool/R4.jpg"
     },
     {
       "card_id": "R005",
       "name": "我不要哇",
       "rarity": "R",
-      "image": "pool/R5.png"
+      "image": "pool/R5.jpg"
+    },
+    {
+      "card_id": "R006",
+      "name": "魷刃有餘",
+      "rarity": "R",
+      "image": "pool/R6.jpg"
+    },
+    {
+      "card_id": "R007",
+      "name": "魷病吧",
+      "rarity": "R",
+      "image": "pool/R7.jpg"
+    },
+    {
+      "card_id": "R008",
+      "name": "魷豫不決",
+      "rarity": "R",
+      "image": "pool/R8.jpg"
+    },
+    {
+      "card_id": "R009",
+      "name": "人間魷物",
+      "rarity": "R",
+      "image": "pool/R9.jpg"
+    },
+    {
+      "card_id": "R010",
+      "name": "愛你魷",
+      "rarity": "R",
+      "image": "pool/R10.jpg"
     }
   ]
 }
